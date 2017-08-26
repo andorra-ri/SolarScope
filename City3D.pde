@@ -1,9 +1,11 @@
 import java.util.TreeMap;
+import org.gicentre.geomap.*;
 
 public class City3D {
     
     private final PApplet PARENT;
     private final int WIDTH, HEIGHT;
+    private LatLon[] bounds;
     
     private ArrayList<Building3D> buildings;
     
@@ -43,6 +45,11 @@ public class City3D {
         GeoMap geoMap = new GeoMap(0, 0, WIDTH, HEIGHT, PARENT);
         geoMap.readFile(pathGIS);
         Table attributes = geoMap.getAttributeTable();
+        
+        bounds = new LatLon[] {
+            new LatLon(geoMap.getMaxGeoY(), geoMap.getMinGeoX()),
+            new LatLon(geoMap.getMinGeoY(), geoMap.getMaxGeoX())
+        };
         
         float dY = geoMap.getMaxGeoY() - geoMap.getMinGeoY();
         if(proj == Projection.EPSG4326) dY *= 111320;
@@ -139,6 +146,7 @@ public class City3D {
         for(Building3D building : buildings) {
             building.setColor(c);
         }
+        update();
     }
     
     
@@ -148,6 +156,7 @@ public class City3D {
                 building.setColor(colors.get( building.ATTRIBUTES.getString(column)));
             }
         }
+        update();
     }
     
     
@@ -156,6 +165,7 @@ public class City3D {
             float value = building.ATTRIBUTES.getFloat(sch.ATTRIBUTE);
             building.setColor( sch.getColor(value) );
         }
+        update();
     }
     
     
@@ -164,6 +174,7 @@ public class City3D {
             if(building.ID == i) building.paint(fillColor);
             else building.paint();      
         }
+        update();
     }
     
     
@@ -177,7 +188,22 @@ public class City3D {
                 }
             }
         }
-        update();
+    }
+    
+    
+    public PVector toPosition(float lat, float lon) {
+        return new PVector(
+            map(lon, bounds[0].getLon(), bounds[1].getLon(), 0, WIDTH),
+            map(lat, bounds[0].getLat(), bounds[1].getLat(), 0, HEIGHT)
+        );
+    }
+    
+    
+    public int select(PVector pos) {
+        for(Building3D b : buildings) {
+            if(b.contains(pos)) return b.ID;
+        }
+        return -1;
     }
     
     

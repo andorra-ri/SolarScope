@@ -1,2 +1,2 @@
-# Urban3D
-Create 3D urban scenarios from GIS files
+# SolarScope
+Implementation of CityScope concept to visualize information about solar radiation and solar energy production

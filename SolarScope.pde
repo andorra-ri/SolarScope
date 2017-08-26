@@ -1,21 +1,37 @@
-import org.gicentre.geomap.*;
+public enum Projection { EPSG4326, EPSG3857 };
+
+WarpSurface surface;
+/*
+final LatLon[] ROI = new LatLon[] {
+    new LatLon(42.505085,1.509961),
+    new LatLon(42.517067,1.544024),
+    new LatLon(42.508160,1.549798),
+    new LatLon(42.496162,1.515728)
+};
+*/
+
+Canvas orthophoto, buildings;
+final LatLon[] bounds = new LatLon[] {
+    new LatLon(42.5181, 1.50803),
+    new LatLon(42.495, 1.55216)
+};
 
 City3D city;
+
 
 ArrayList<ColorSchema> colors = new ArrayList();
 int it = -1;
 
-public enum Projection { EPSG4326, EPSG3857 };
 
 void setup() {
 
     size(1200,805,P3D);
-    
-    // CAUTION! Bug: Picker not working with pixelDensity(2).
-    // Keep commented until fixed
     //pixelDensity(2); 
     
-    city = new City3D(this, width, height, "gis/buildings", Projection.EPSG3857);
+    surface = new WarpSurface(this, "surface.xml");
+    orthophoto = new Canvas(this, "textures/orto_epsg3857.jpg", bounds);
+    
+    city = new City3D(this, width, height, "gis/buildings_EPSG4326", Projection.EPSG4326);
     city.paint(#37383a);
     
     ColorSchema ir = new ColorSchema("Irradiació Útil", "kWh/m2", "ir_use");
@@ -66,13 +82,19 @@ void draw() {
     if(it != -1) colors.get(it).drawLegend(40,40, 200);
     //text(frameRate, 20, 20);
 
+    surface.draw(orthophoto);
+
 }
 
 
 void mouseClicked() {
-    int i = city.pick(mouseX, mouseY);
-    city.highlight(i, #00FF00);    // #E40205
-    city.centerAt(i);
+    LatLon loc = surface.unmapPoint(mouseX, mouseY);
+    if(loc != null) {
+        PVector pos = city.toPosition(loc.getLat(), loc.getLon());
+        int i = city.select(pos);
+        city.highlight(i, #FF0000);
+        city.centerAt(i);
+    }
 }
 
 void keyPressed() {
