@@ -88,18 +88,6 @@ public class Building3D extends LandArea implements Pickable {
     }
     
     
-    public boolean contains(PVector p) {
-        int i, j;
-        boolean result = false;
-        for (i = 0, j = CONTOUR.length - 1; i < CONTOUR.length; j = i++) {
-            if ((CONTOUR[i].y > p.y) != (CONTOUR[j].y > p.y) && (p.x < (CONTOUR[j].x - CONTOUR[i].x) * (p.y - CONTOUR[i].y) / (CONTOUR[j].y-CONTOUR[i].y) + CONTOUR[i].x)) {
-                result = !result;
-            }
-        }
-        return result;
-    }
-    
-    
     public void draw() {
         shape(extrusion);
     }

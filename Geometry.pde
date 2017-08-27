@@ -14,23 +14,23 @@ public static class Geometry {
         return PVector.add(a, ab);
     }
     
-    public static boolean inTriangle(PVector p, PVector t1, PVector t2, PVector t3) {
-        boolean b1 = Sign(p, t1, t2) < 0.0f;
-        boolean b2 = Sign(p, t2, t3) < 0.0f;
-        boolean b3 = Sign(p, t3, t1) < 0.0f;
-        return ((b1 == b2) && (b2 == b3));
-    }
-    
-    
-    private static float Sign(PVector p1, PVector p2, PVector p3) {
-        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
-    }
-    
     
     private static PVector linesIntersection(PVector p1, PVector p2, PVector p3, PVector p4) {
         float d = (p2.x-p1.x) * (p4.y - p3.y) - (p2.y-p1.y) * (p4.x - p3.x);
         if(d == 0) return null;
         return new PVector(p1.x+(((p3.x - p1.x) * (p4.y - p3.y) - (p3.y - p1.y) * (p4.x - p3.x)) / d)*(p2.x-p1.x), p1.y+(((p3.x - p1.x) * (p4.y - p3.y) - (p3.y - p1.y) * (p4.x - p3.x)) / d)*(p2.y-p1.y));
+    }
+    
+    public static boolean polygonContains(PVector p, PVector... vertices) {
+        if(vertices.length < 2) return false;
+        int i, j;
+        boolean result = false;
+        for (i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+            if ((vertices[i].y > p.y) != (vertices[j].y > p.y) && (p.x < (vertices[j].x - vertices[i].x) * (p.y - vertices[i].y) / (vertices[j].y-vertices[i].y) + vertices[i].x)) {
+                result = !result;
+            }
+        }
+        return result;
     }
     
 }

@@ -191,7 +191,7 @@ public class City3D {
     
     public int select(PVector pos) {
         for(Building3D b : buildings) {
-            if(b.contains(pos)) return b.ID;
+            if(Geometry.polygonContains(pos, b.CONTOUR)) return b.ID;
         }
         return -1;
     }

@@ -315,7 +315,7 @@ public class WarpSurface extends Observable {
     
     
     protected LatLon trianglePoint(PVector point, int c, int r, int i, int j) {
-        if(Geometry.inTriangle(point, controlPoints[c][r], controlPoints[c-1][r-1], controlPoints[i][j])) {
+        if(Geometry.polygonContains(point, controlPoints[c][r], controlPoints[c-1][r-1], controlPoints[i][j])) {
             PVector projPoint = Geometry.linesIntersection(controlPoints[c-1][r-1], point, controlPoints[i][j], controlPoints[c][r]);
             float r1 = PVector.sub(projPoint, controlPoints[i][j]).mag() / PVector.sub(controlPoints[i][j], controlPoints[c][r]).mag();
             float r2 = PVector.sub(point, controlPoints[c-1][r-1]).mag() / PVector.sub(projPoint, controlPoints[c-1][r-1]).mag();
