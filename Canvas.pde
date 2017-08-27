@@ -114,6 +114,11 @@ public class Canvas extends PGraphics2D implements Drawable {
     }
     
     
+    /**
+    * Draw a shape
+    * @param xCoords    x position of shape's vertices
+    * @param yCoords    y position of shape's vertices
+    */
     public void shape(float[] xCoords, float[] yCoords) {
         beginShape();
         for(int i = 0; i < xCoords.length; i++) {
@@ -123,6 +128,11 @@ public class Canvas extends PGraphics2D implements Drawable {
     }
     
     
+    /**
+    * Draw a polyline
+    * @param xCoords    x position of polyline's vertices
+    * @param yCoords    y position of polyline's vertices
+    */
     public void polyLine(float[] xCoords, float[] yCoords) {
         for(int i = 1; i < xCoords.length; i++) {
             line(xCoords[i-1], yCoords[i-1], xCoords[i], yCoords[i]);

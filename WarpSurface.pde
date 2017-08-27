@@ -3,7 +3,7 @@
 * 3D surface. Its corner coordinates define a Region Of Interest that will be drawn as a texture
 * from a Canvas
 * @author    Marc Vilella
-* @version   1.1b
+* @version   1.11b
 */
 
 import java.util.Observable;
@@ -162,17 +162,14 @@ public class WarpSurface extends Observable {
     * @param canvas    the canvas to draw 
     */
     public void draw(Canvas canvas) {
-        
         if(!canvas.equals(prevCanvas)) { // Update drawROI points if canvas changed
             drawROI = canvas.toScreen(ROIPoints);
             prevCanvas = canvas;
         }
-
         if(calibrate) {
             stroke(#FF0000);
             strokeWeight(0.5);
         } else noStroke();
-        
         for(int r = 1; r < rows; r++) {
             beginShape(TRIANGLE_STRIP);
             texture(canvas);
@@ -182,7 +179,6 @@ public class WarpSurface extends Observable {
             }
             endShape();
         }
-        
     }
     
     
@@ -267,6 +263,11 @@ public class WarpSurface extends Observable {
     }
     
     
+    /**
+    * Move surface
+    * @param dX    Horizontal displacement
+    * @param dY    Vertical displacement
+    */
     protected void move(int dX, int dY) {
         for(int c = 0; c < cols; c++) {
             for(int r = 0; r < rows; r++) {
@@ -314,6 +315,15 @@ public class WarpSurface extends Observable {
     }
     
     
+    /**
+    * Get the location (latitude, longitude) of a point in a surface triangle
+    * @param point    Position of the point
+    * @param c        Column of the most right vertex in triangle
+    * @param r        Row of the lowest vertex in triangle
+    * @param i        Column of the unshared vertex in triangle (used to determine if upper or lower triangle)
+    * @param j        Row of the unshared vertex in triangle (used to determine if upper or lower triangle)
+    * @return the selected control point
+    */
     protected LatLon trianglePoint(PVector point, int c, int r, int i, int j) {
         if(Geometry.polygonContains(point, controlPoints[c][r], controlPoints[c-1][r-1], controlPoints[i][j])) {
             PVector projPoint = Geometry.linesIntersection(controlPoints[c-1][r-1], point, controlPoints[i][j], controlPoints[c][r]);

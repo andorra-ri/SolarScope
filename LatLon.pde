@@ -1,3 +1,8 @@
+/**
+* Geographic datum definitions
+* @autor    Marc Vilella
+* @version  1.0
+*/
 public static enum GeoDatum {
     WGS84(6378137, 298.257223563),     // Worldwide
     ETRS89(6378137, 298.257222101),    // Europe
@@ -20,6 +25,11 @@ public static enum GeoDatum {
 
 
 
+/**
+* Coordinates object representing a geographic position in Earth.
+* @author    Marc Vilella
+* @version   1.0
+*/
 public class LatLon extends PVector {
  
     /**

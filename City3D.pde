@@ -1,6 +1,11 @@
 import java.util.TreeMap;
 import org.gicentre.geomap.*;
 
+/**
+* Representation of a city in 3D. Acts as a facade for the Buildings that belong to city
+* @author    Marc Vilella
+* @version   1.1
+*/
 public class City3D {
     
     private final PApplet PARENT;
@@ -20,6 +25,13 @@ public class City3D {
     
     private PGraphics canvas;
     
+    
+    /**
+    * Construct an empty city in 3D
+    * @param parent    the sketch PApplet
+    * @param width     Width of the city in pixels
+    * @param height    Height of the city in pixels
+    */
     public City3D(PApplet parent, int width, int height) {
         PARENT = parent;
         WIDTH = width;
@@ -34,12 +46,27 @@ public class City3D {
         parent.registerMethod("keyEvent", this);
     }
     
+    
+    /**
+    * Construct a city loading it from a GIS file
+    * @param parent     the sketch PApplet
+    * @param width      Width of the city in pixels
+    * @param height     Height of the city in pixels
+    * @param pathGIS    Path to the GIS file
+    * @param proj       Projection used in GIS file
+    */
     public City3D(PApplet parent, int width, int height, String pathGIS, Projection proj) {
         this(parent, width, height);
         load(pathGIS, proj);
     }
     
     
+    /**
+    * Load city from a GIS file
+    * @param pathGIS    Path to the GIS file
+    * @param proj       Projection used in GIS file
+    * @return
+    */
     public void load(String pathGIS, Projection proj) {
         
         GeoMap geoMap = new GeoMap(0, 0, WIDTH, HEIGHT, PARENT);
@@ -74,6 +101,9 @@ public class City3D {
     }
     
     
+    /**
+    * Draw city's buffer 
+    */
     public void draw() {
        
         boolean update = false;
@@ -95,13 +125,23 @@ public class City3D {
     }
     
     
-    public void update(int centerX, int centerY, float rot, float sc) {
+    /**
+    * Update city drawing parameters
+    * @param centerX    x position of the city's drawing center
+    * @param centerY    y position of the city's drawing center
+    * @param rot        Rotation of the city's drawing
+    * @param sc         Scale of the city's drawing
+    */
+    public void update(int centerX, int centerY, float rotation, float scale) {
         screenPos = new PVector(centerX, centerY);
-        rotationTarget = radians(rot);
-        scaleTarget = sc;
+        rotationTarget = radians(rotation);
+        scaleTarget = scale;
     }
     
     
+    /**
+    * Redraw city's buffer
+    */
     public void update() {
         canvas.beginDraw();
         canvas.clear();
@@ -120,36 +160,62 @@ public class City3D {
     }
     
     
+    /**
+    * Activate or deactivate interactivity with city
+    * @param i    To true if interactivity enabled, false otherwise
+    */
     public void setInteractivity(boolean i) {
         interactive = i;
     }
 
     
-    public void rotate(float rotation) {
-        rotationTarget += rotation;
+    /**
+    * Rotate the city
+    * @param dR    Rotation increment angle in degrees
+    */
+    public void rotate(float dR) {
+        rotationTarget += dR;
     }
     
     
+    /**
+    * Move the city. The movement will translate also the rotation center
+    * @param dX    x increment in pixels
+    * @param dY    y increment in pixels
+    */
     public void move(float dX, float dY) {
         PVector mov = new PVector(dX, dY).rotate(-rotation);
         centerTarget.add(mov);
     }
     
     
-    public void zoom(float dScale) {
-        if(scaleTarget + dScale > 0) scaleTarget += dScale;
+    /**
+    * Change zoom of the city
+    * @param dScale    Zoom increment
+    */
+    public void zoom(float dZ) {
+        if(scaleTarget + dZ > 0) scaleTarget += dZ;
         else scaleTarget = 1;
     }
     
     
-    public void paint(color c) {
+    /**
+    * Paint buildings with a color
+    * @param fillColor    Color to paint buildings
+    */
+    public void paint(color fillColor) {
         for(Building3D building : buildings) {
-            building.setColor(c);
+            building.setColor(fillColor);
         }
         update();
     }
     
     
+    /**
+    * Paint buildings with a color depending on a specific attribute
+    * @param attribute    Building's attribute that will determine painting color
+    * @param scheme       Scheme with possible [range of] colors
+    */
     public void paint(String attribute, ColorScheme scheme) {
         for(Building3D building : buildings) {
             float value = building.ATTRIBUTES.getFloat(attribute);
@@ -159,20 +225,29 @@ public class City3D {
     }
     
     
-    public void highlight(int i, color fillColor) {
+    /**
+    * Temporally paint a building with a color 
+    * @param id           ID of the building to paint
+    * @param fillColor    Color to fill the selected building
+    */
+    public void highlight(int id, color fillColor) {
         for(Building3D building : buildings) {
-            if(building.ID == i) building.paint(fillColor);
+            if(building.ID == id) building.paint(fillColor);
             else building.paint();      
         }
         update();
     }
     
     
-    public void centerAt(int i) {
-        if(i == -1) centerTarget = new PVector(WIDTH/2, HEIGHT/2);
+    /**
+    * Center city (and rotation center) to a building. If building invalid, center to city's center
+    * @param id    ID of the building to center
+    */
+    public void centerAt(int id) {
+        if(id == -1) centerTarget = new PVector(WIDTH/2, HEIGHT/2);
         else {
             for(Building3D building : buildings) {
-                if(building.ID == i) {
+                if(building.ID == id) {
                     centerTarget = building.getCentroid();
                     break;
                 }
@@ -181,6 +256,12 @@ public class City3D {
     }
     
     
+    /**
+    * Translate a Lat, Lon location to a position in the city
+    * @param lat    Latitude of location
+    * @param lon    Longitude of location
+    * @return translated position in pixels
+    */
     public PVector toPosition(float lat, float lon) {
         return new PVector(
             map(lon, bounds[0].getLon(), bounds[1].getLon(), 0, WIDTH),
@@ -189,14 +270,23 @@ public class City3D {
     }
     
     
-    public int select(PVector pos) {
+    /**
+    * Select a building that contains a point
+    * @param p    Point to select the building
+    */
+    public int select(PVector p) {
         for(Building3D b : buildings) {
-            if(Geometry.polygonContains(pos, b.CONTOUR)) return b.ID;
+            if(Geometry.polygonContains(p, b.CONTOUR)) return b.ID;
         }
         return -1;
     }
     
     
+    /**
+    * Pick a building in a 3D scenario
+    * @param x    x component of the picking position
+    * @param y    y component of the picking position
+    */
     public int pick(int x, int y) {
         PGraphics pickMap = createGraphics(width, height, P3D);
         pickMap.beginDraw();
@@ -220,6 +310,10 @@ public class City3D {
     }
     
     
+    /**
+    * Mouse event handler
+    * @param e    the mouse event
+    */
     public void mouseEvent(MouseEvent e) {
         if(!interactive) return;
         switch(e.getAction()) {
@@ -231,6 +325,10 @@ public class City3D {
     }
     
     
+    /**
+    * Key event handler
+    * @param e    the key event
+    */
     public void keyEvent(KeyEvent e) {
         if(!interactive) return;
         if(e.getAction() == KeyEvent.PRESS) {
