@@ -240,6 +240,13 @@ public class WarpSurface extends Observable {
         if(calibrate) {
             switch(e.getAction()) {
                 case KeyEvent.PRESS:
+                    switch(e.getKey()) {
+                        case 'l':
+                            loadConfig("surface.xml");
+                            break;
+                        case 's':
+                            saveConfig("surface.xml");
+                    }
                     switch(e.getKeyCode()) {
                         case UP:
                             this.move(0,-5);

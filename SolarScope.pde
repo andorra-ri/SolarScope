@@ -99,6 +99,9 @@ void mouseClicked() {
 
 void keyPressed() {
     switch(key) {
+        case 'c':
+            surface.toggleCalibration();
+            break;
         case 'r':
             it = -1;
             city.paint(#37383a);
