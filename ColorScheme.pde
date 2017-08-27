@@ -1,33 +1,40 @@
 import java.util.TreeMap;
 import java.util.Map.*;
 
-public class ColorSchema {
+/**
+* Choice of colors used for a range of values
+* @author    Marc Vilella
+* @version   1.0
+*/
+public class ColorScheme {
 
-    public final String TITLE;
-    public final String UNIT;
-    public final String ATTRIBUTE;
-    
     private color invalid = #37383a;    // default invalid color
-    private TreeMap<Float, Integer> colors;
+    private TreeMap<Float, Integer> colors = new TreeMap();
     
-    public ColorSchema(String title, String unit, String attr) {
-        TITLE = title;
-        UNIT = unit;
-        ATTRIBUTE = attr;
-        colors = new TreeMap();
-    }
-    
-    
-    public void setInvalid(color c) {
+    /**
+    * Set the color for invalid values, this is values outside range
+    * @param c    Color for invalid values
+    */
+    public void setInvalidColor(color c) {
         invalid = c;
     }
     
     
+    /**
+    * Add new value/color couple to the scheme
+    * @param value    New value
+    * @param c        New color corresponding to value
+    */
     public void addColor(float value, color c) {
         colors.put(value, c);
     }
     
     
+    /**
+    * Return the color corresponding to the value
+    * @param value    Value to get get the color
+    * @return the [interpolated] color corresponding to the value
+    */
     public color getColor(float value) {
         if(value < colors.firstKey() || value > colors.lastKey()) return invalid;
         else {
@@ -42,6 +49,12 @@ public class ColorSchema {
     }
     
     
+    /**
+    * 
+    * @param
+    * @param
+    * @return
+    */
     public void drawLegend(int x, int y, int w) {
         float min = colors.firstKey();
         float max = colors.lastKey();
@@ -52,9 +65,9 @@ public class ColorSchema {
         rect(0, 0, w, 65, 5);
         fill(#FFFFFF);
         textAlign(LEFT, BOTTOM); textSize(16);
-        text(TITLE, 15, 27);
+        //text(TITLE, 15, 27);
         textAlign(RIGHT, BOTTOM); textSize(14);
-        text(UNIT, w - 15, 27);
+        //text(UNIT, w - 15, 27);
         beginShape(QUAD_STRIP);
         for(Entry<Float, Integer> c : colors.entrySet()) {
             float xPos = map(c.getKey(), min, max, 15, w - 15);

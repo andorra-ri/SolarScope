@@ -19,7 +19,7 @@ final LatLon[] bounds = new LatLon[] {
 City3D city;
 
 
-ArrayList<ColorSchema> colors = new ArrayList();
+HashMap<String, ColorScheme> colors = new HashMap();
 int it = -1;
 
 
@@ -34,38 +34,28 @@ void setup() {
     city = new City3D(this, width, height, "gis/buildings_EPSG4326", Projection.EPSG4326);
     city.paint(#37383a);
     
-    ColorSchema ir = new ColorSchema("Irradiació Útil", "kWh/m2", "ir_use");
+    ColorScheme ir = new ColorScheme();
     ir.addColor(0.1, #636bff);
     ir.addColor(396, #70ff67);
     ir.addColor(792, #fcf663);
     ir.addColor(1189, #e24f4f);
-    colors.add(ir);
+    colors.put("irradiation", ir);
     
-    ColorSchema pot = new ColorSchema("Potència Instal·lable", "W", "pow_instal");
+    ColorScheme pot = new ColorScheme();
     pot.addColor(0.1, #fcf663);
     pot.addColor(336, #e24f4f);
     pot.addColor(672, #ff91f7);
-    colors.add(pot);
+    colors.put("power", pot);
     
-    ColorSchema elec = new ColorSchema("Electricitat Generada", "MWh", "electr_gen");
+    ColorScheme elec = new ColorScheme();
     elec.addColor(0.1, #fcf663);
     elec.addColor(672, #e24f4f);
-    colors.add(elec);
+    colors.put("electricity", elec);
     
-    ColorSchema co2 = new ColorSchema("Estalvi CO2", "t CO2", "co2_saving");
+    ColorScheme co2 = new ColorScheme();
     co2.addColor(0.1, #d2e68d);
     co2.addColor(2195, #297d7d);
-    colors.add(co2);
-    
-    /*
-    IntDict useColor = new IntDict();
-    useColor.add("Residential", #8E9E82);
-    useColor.add("Sport",#8FB58C);
-    useColor.add("Office", #A9C1D9);
-    useColor.add("Commercial", #607890);
-    useColor.add("Hostelry", #B8E6FF);
-    city.paint("Use", useColor);
-    */
+    colors.put("co2", co2);
     
     city.update(width/2, height/2, 0, 3);
 
@@ -109,9 +99,6 @@ void keyPressed() {
             break;
             
         case ' ':
-            it = (it + 1) % colors.size();
-            city.paint( colors.get(it) );
-            city.update();
-            break;
+            city.paint("ir_use", colors.get("irradiation"));
     }
 }

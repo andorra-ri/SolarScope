@@ -150,20 +150,10 @@ public class City3D {
     }
     
     
-    public void paint(String column, IntDict colors) {
+    public void paint(String attribute, ColorScheme scheme) {
         for(Building3D building : buildings) {
-            if(colors.hasKey(building.ATTRIBUTES.getString(column))) {
-                building.setColor(colors.get( building.ATTRIBUTES.getString(column)));
-            }
-        }
-        update();
-    }
-    
-    
-    public void paint(ColorSchema sch) {
-        for(Building3D building : buildings) {
-            float value = building.ATTRIBUTES.getFloat(sch.ATTRIBUTE);
-            building.setColor( sch.getColor(value) );
+            float value = building.ATTRIBUTES.getFloat(attribute);
+            building.setColor( scheme.getColor(value) );
         }
         update();
     }
