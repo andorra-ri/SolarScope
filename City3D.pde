@@ -40,7 +40,7 @@ public class City3D {
         screenPos = new PVector(parent.width/2, parent.height/2);
         centerPoint = new PVector(WIDTH/2, HEIGHT/2);
         centerTarget = new PVector(WIDTH/2, HEIGHT/2);
-        canvas = createGraphics(parent.width, parent.height, P3D);
+        canvas = createGraphics(WIDTH, HEIGHT, P3D);
         
         parent.registerMethod("mouseEvent", this);
         parent.registerMethod("keyEvent", this);
