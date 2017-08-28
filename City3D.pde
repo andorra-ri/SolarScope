@@ -125,6 +125,17 @@ public class City3D {
     }
     
     
+    public Canvas drawPlan() {
+        Canvas c = new Canvas(PARENT, WIDTH, HEIGHT, bounds);
+        c.beginDraw();
+        c.background(0);
+        c.fill(#FFFFFF); c.stroke(#A0A0A0);
+        for(Building3D b : buildings) b.drawPlan(c);
+        c.endDraw();
+        return c;
+    }
+    
+    
     /**
     * Update city drawing parameters
     * @param centerX    x position of the city's drawing center

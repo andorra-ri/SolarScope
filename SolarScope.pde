@@ -10,11 +10,12 @@ final LatLon[] ROI = new LatLon[] {
 };
 */
 
-Canvas orthophoto, buildings;
-final LatLon[] bounds = new LatLon[] {
+Canvas orthophoto, plan;
+final LatLon[] orthoBounds = new LatLon[] {
     new LatLon(42.5181, 1.50803),
     new LatLon(42.495, 1.55216)
 };
+boolean showPlan;
 
 City3D city;
 
@@ -58,6 +59,8 @@ void setup() {
     colors.put("co2", co2);
     
     city.update(width/2, height/2, 0, 3);
+    
+    plan = city.drawPlan();
 
 }
 
@@ -72,7 +75,7 @@ void draw() {
     if(it != -1) colors.get(it).drawLegend(40,40, 200);
     //text(frameRate, 20, 20);
 
-    surface.draw(orthophoto);
+    surface.draw(showPlan ? plan : orthophoto);
 
 }
 
@@ -100,5 +103,10 @@ void keyPressed() {
             
         case ' ':
             city.paint("ir_use", colors.get("irradiation"));
+            break;
+            
+        case 'p':
+            showPlan = !showPlan;
+        
     }
 }
