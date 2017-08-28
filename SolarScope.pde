@@ -17,6 +17,10 @@ final LatLon[] orthoBounds = new LatLon[] {
 };
 boolean showPlan;
 
+HashMap<String, Canvas> solarTextures;
+//final String[] SOLAR_SEQUENCE = new String[] {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+final String[] SOLAR_SEQUENCE = new String[] {"JAN", "FEB", "MAR"};
+
 City3D city;
 
 
@@ -27,10 +31,19 @@ int it = -1;
 void setup() {
 
     size(1200,805,P3D);
-    //pixelDensity(2); 
     
     surface = new WarpSurface(this, "surface.xml");
-    orthophoto = new Canvas(this, "textures/orto_epsg3857.jpg", bounds);
+    orthophoto = new Canvas(this, "textures/orto_epsg3857.jpg", orthoBounds);
+    
+    solarTextures = new HashMap<String, Canvas>();
+    for(String s : SOLAR_SEQUENCE) {
+        try { 
+            solarTextures.put(s, new Canvas(this, "textures/solar/" + s + "_epsg3857.jpg", orthoBounds));
+            print("[" + s + " OK]");
+        } catch (OutOfMemoryError e) {
+            print("[" + s + " KO]");
+        }
+    }
     
     city = new City3D(this, width, height, "gis/buildings_EPSG4326", Projection.EPSG4326);
     city.paint(#37383a);
