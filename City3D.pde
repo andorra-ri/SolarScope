@@ -92,7 +92,7 @@ public class City3D {
             for(int v = 0; v < poly.getNumVertices()-1; v++) {
                 contour[v] = geoMap.geoToScreen(x[v], y[v]);  
             }
-            Building3D building = new Building3D(i, attributes.getRow(i), contour);
+            Building3D building = new Building3D(buildings.size(), attributes.getRow(i), contour);
 
             buildings.add(building);
         }
@@ -256,14 +256,7 @@ public class City3D {
     */
     public void centerAt(int id) {
         if(id == -1) centerTarget = new PVector(WIDTH/2, HEIGHT/2);
-        else {
-            for(Building3D building : buildings) {
-                if(building.ID == id) {
-                    centerTarget = building.getCentroid();
-                    break;
-                }
-            }
-        }
+        else centerTarget = buildings.get(id).getCentroid();
     }
     
     
