@@ -9,6 +9,7 @@ import org.gicentre.geomap.*;
 
 public class Canvas extends PGraphics2D implements Drawable {
 
+    private final PApplet PARENT; 
     public final LatLon[] BOUNDS;
     
     /*
@@ -21,7 +22,8 @@ public class Canvas extends PGraphics2D implements Drawable {
     * @param bounds    the bounding box coordinates. First coordinate is TOP-LEFT and second BOTTOM-RIGHT
     */
     public Canvas(PApplet parent, int width, int height, LatLon[] bounds) {
-        this.BOUNDS = bounds;
+        PARENT = parent;
+        BOUNDS = bounds;
         setParent(parent);
         setPrimary(false);
         setPath(parent.dataPath(""));
@@ -40,9 +42,29 @@ public class Canvas extends PGraphics2D implements Drawable {
         this(parent, 0, 0, bounds);
         PImage bg = loadImage(imgPath);
         resize(bg.width, bg.height);
+        paint(bg);
+    }
+    
+    
+    /** 
+    * Clone this canvas
+    * @return a copy of this canvas;
+    */
+    public Canvas clone() {
+        Canvas cloned = new Canvas(PARENT, this.width, this.height, BOUNDS);
+        cloned.paint(this);
+        return cloned;
+    }
+    
+    
+    /**
+    * Paint an image as background
+    * @param img    the background image
+    */
+    public void paint(PImage img) {
         beginDraw();
-        image(bg, 0, 0, this.width, this.height);
-        endDraw();
+        image(img, 0, 0, this.width, this.height);
+        endDraw();   
     }
     
     
