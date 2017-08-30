@@ -102,7 +102,7 @@ public class City3D {
     
     
     /**
-    * Draw city's buffer 
+    * Draw city 
     */
     public void draw() {
        
@@ -125,11 +125,24 @@ public class City3D {
     }
 
     
+    /**
+    * Draw selected buildings plan to a blank canvas
+    * @param fillColor    the color to fill the building plans
+    * @param ids          ids of the buildings to draw. It can be empty or multiple numbers
+    * @return the canvas with selected buildings drawn
+    */
     public Canvas drawPlan(color fillColor, int... ids) {
         return drawPlan(null, fillColor, ids);
     }
     
     
+    /**
+    * Draw selected buildings plan to a new canvas with a background
+    * @param bg           tho background of the new canvas
+    * @param fillColor    the color to fill the building plans
+    * @param ids          ids of the buildings to draw. It can be empty or multiple numbers
+    * @return the canvas with selected buildings drawn
+    */
     public Canvas drawPlan(Canvas bg, color fillColor, int... ids) {
         Canvas canvas = bg == null ? new Canvas(PARENT, WIDTH, HEIGHT, bounds) : bg.clone();
         PVector posTL = canvas.toScreen(bounds[0]);

@@ -158,6 +158,10 @@ public class Building3D extends LandArea implements Pickable {
     }
     
     
+    /**
+    * Draw the building plan into the canvas
+    * @param canvas    the canvas to draw the building
+    */
     public void drawPlan(PGraphics canvas) {
       canvas.beginShape();  
       for(PVector c : CONTOUR) canvas.vertex(c.x, c.y);
