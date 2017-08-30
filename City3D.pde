@@ -123,16 +123,36 @@ public class City3D {
         
         image(canvas, 0, 0);    
     }
+
+    
+    public Canvas drawPlan(color fillColor, int... ids) {
+        return drawPlan(null, fillColor, ids);
+    }
     
     
-    public Canvas drawPlan() {
-        Canvas c = new Canvas(PARENT, WIDTH, HEIGHT, bounds);
-        c.beginDraw();
-        c.background(0);
-        c.fill(#FFFFFF); c.stroke(#A0A0A0);
-        for(Building3D b : buildings) b.drawPlan(c);
-        c.endDraw();
-        return c;
+    public Canvas drawPlan(Canvas bg, color fillColor, int... ids) {
+        Canvas canvas = bg == null ? new Canvas(PARENT, WIDTH, HEIGHT, bounds) : bg.clone();
+        PVector posTL = canvas.toScreen(bounds[0]);
+        PVector posBR = canvas.toScreen(bounds[1]);
+        float scale = (posBR.x - posTL.x) / WIDTH;
+        //Canvas canvas = bg.clone();
+        canvas.beginDraw();
+        canvas.pushMatrix();
+        canvas.translate(posTL.x, posTL.y);
+        canvas.scale(scale);
+        canvas.fill(fillColor); canvas.noStroke();
+        if(ids.length > 0) {
+            for(int id : ids) {
+                if(id > -1 && id < buildings.size()) buildings.get(id).drawPlan(canvas);
+            }
+        } else {
+            for(Building3D b : buildings) {
+                b.drawPlan(canvas);
+            }
+        }
+        canvas.popMatrix();
+        canvas.endDraw();
+        return canvas;
     }
     
     
