@@ -1,12 +1,14 @@
 import java.util.TreeMap;
 import org.gicentre.geomap.*;
 
+import java.util.Observable;
+
 /**
 * Representation of a city in 3D. Acts as a facade for the Buildings that belong to city
 * @author    Marc Vilella
 * @version   1.1
 */
-public class City3D {
+public class City3D extends Observable {
     
     private final PApplet PARENT;
     private final int WIDTH, HEIGHT;
@@ -121,7 +123,7 @@ public class City3D {
         }
         if(update) update();
         
-        image(canvas, 0, 0);    
+        image(canvas, 0, 0, width/3, height);    
     }
 
     
@@ -153,13 +155,42 @@ public class City3D {
         canvas.pushMatrix();
         canvas.translate(posTL.x, posTL.y);
         canvas.scale(scale);
-        canvas.fill(fillColor); canvas.noStroke();
         if(ids.length > 0) {
             for(int id : ids) {
+                canvas.fill(fillColor); canvas.noStroke();
                 if(id > -1 && id < buildings.size()) buildings.get(id).drawPlan(canvas);
             }
         } else {
             for(Building3D b : buildings) {
+                canvas.fill(fillColor); canvas.noStroke();
+                b.drawPlan(canvas);
+            }
+        }
+        canvas.popMatrix();
+        canvas.endDraw();
+        return canvas;
+    }
+    
+    
+    public Canvas drawPlan(Canvas bg, Table data, String attribute, ColorScheme colors, int... ids) {
+        Canvas canvas = bg == null ? new Canvas(PARENT, WIDTH, HEIGHT, bounds) : bg.clone();
+        PVector posTL = canvas.toScreen(bounds[0]);
+        PVector posBR = canvas.toScreen(bounds[1]);
+        float scale = (posBR.x - posTL.x) / WIDTH;
+        canvas.beginDraw();
+        canvas.pushMatrix();
+        canvas.translate(posTL.x, posTL.y);
+        canvas.scale(scale);
+        if(ids.length > 0) {
+            for(int id : ids) {
+                color c = colors.getColor(data.getRow(id).getFloat(attribute));
+                canvas.fill(c); canvas.noStroke();
+                if(id > -1 && id < buildings.size()) buildings.get(id).drawPlan(canvas);
+            }
+        } else {
+            for(Building3D b : buildings) {
+                color c = colors.getColor(data.getRow(b.ID).getFloat(attribute));
+                canvas.fill(c); canvas.noStroke();
                 b.drawPlan(canvas);
             }
         }
@@ -313,8 +344,14 @@ public class City3D {
     */
     public int select(PVector p) {
         for(Building3D b : buildings) {
-            if(Geometry.polygonContains(p, b.CONTOUR)) return b.ID;
+            if(Geometry.polygonContains(p, b.CONTOUR)) {
+                setChanged();
+                notifyObservers(b);
+                return b.ID;
+            }
         }
+        setChanged();
+        notifyObservers(null);
         return -1;
     }
     

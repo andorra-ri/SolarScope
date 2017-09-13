@@ -10,37 +10,49 @@ final LatLon[] ROI = new LatLon[] {
 };
 */
 
-Canvas orthophoto, plan;
 final LatLon[] orthoBounds = new LatLon[] {
     new LatLon(42.5181, 1.50803),
     new LatLon(42.495, 1.55216)
 };
-boolean showPlan;
+Canvas mainCanvas, orthophoto;
 
 City3D city;
 
+final int MOD_POW = 250;
+final float MOD_EFF = 0.8;
+final String[] MONTHS = new String[] { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+Table solarAttributes;
+Panel panel;
+
+Slider monthRadiation;
 
 HashMap<String, ColorScheme> colors = new HashMap();
 int it = -1;
 
+PImage logo;
 
 void setup() {
 
-    size(1200,805,P3D);
-    //pixelDensity(2); 
+    //size(1200,805,P3D);
+    fullScreen(P3D, SPAN);
     
-    surface = new WarpSurface(this, "surface.xml");
-    orthophoto = new Canvas(this, "textures/orto_epsg3857.jpg", bounds);
+    logo =  loadImage("logoOBSA.png");
     
-    city = new City3D(this, width, height, "gis/buildings_EPSG4326", Projection.EPSG4326);
+    solarAttributes = loadTable("solar.csv", "header, csv");
+    panel = new Panel(500, height);
+    
+    surface = new WarpSurface(this, "surface_screen.xml");
+    orthophoto = new Canvas(this, "textures/orto_epsg3857.jpg", orthoBounds);
+    
+    monthRadiation = new Slider(this, "textures/solar", MONTHS, orthoBounds);
+    
+    //city = new City3D(this, 1200,795, "gis/buildings", Projection.EPSG4326);
+    city = new City3D(this, 1630,1080, "gis/buildings", Projection.EPSG4326);
     city.paint(#37383a);
+    city.update(width/6, height/2, 200, 2);
     
-    ColorScheme ir = new ColorScheme();
-    ir.addColor(0.1, #636bff);
-    ir.addColor(396, #70ff67);
-    ir.addColor(792, #fcf663);
-    ir.addColor(1189, #e24f4f);
-    colors.put("irradiation", ir);
+    city.addObserver(panel);
+    
     
     ColorScheme pot = new ColorScheme();
     pot.addColor(0.1, #fcf663);
@@ -58,25 +70,47 @@ void setup() {
     co2.addColor(2195, #297d7d);
     colors.put("co2", co2);
     
-    city.update(width/2, height/2, 0, 3);
+    ColorScheme returnPeriod = new ColorScheme();
+    returnPeriod.addColor(0, color(#FF0000,170));
+    returnPeriod.addColor(10, color(#FF0000,170));
+    returnPeriod.addColor(10.1, color(#FF8800,170));
+    returnPeriod.addColor(12, color(#FF8800,170));
+    returnPeriod.addColor(12.1, color(#FFFF00,170));
+    returnPeriod.addColor(14, color(#FFFF00,170));
+    returnPeriod.addColor(12.1, color(#FFFF88,170));
+    returnPeriod.addColor(16, color(#FFFF88,170));
     
-    plan = city.drawPlan();
-
+    //mainCanvas = city.drawPlan(orthophoto, color(#00FF00, 170));
+    mainCanvas = city.drawPlan(orthophoto, solarAttributes, "return_period", returnPeriod);
+    
 }
 
 
 void draw() {
     
-    background(#181B1C);
-
+    //cursor( mouseX > width / 3 && mouseX < 2 * width / 3 ? CROSS : ARROW );
+    
+    background(0);
+    
+    if(monthRadiation.isActive()) {
+        if(frameCount % 60 == 0) mainCanvas = monthRadiation.next();
+        monthRadiation.drawLegend();
+    }
+    
+    city.rotate(0.001);
     city.draw();
  
+    /* 
     fill(#FFFFFF);
     if(it != -1) colors.get(it).drawLegend(40,40, 200);
-    //text(frameRate, 20, 20);
-
-    surface.draw(showPlan ? plan : orthophoto);
-
+    */
+    
+    surface.draw(mainCanvas);
+    
+    panel.draw();
+    image(logo, width/3 - 300, 200, 130, 30);
+    fill(255); textAlign(LEFT, TOP);
+    text("http://www.obsa.ad/solar", width/3-300, 250);
 }
 
 
@@ -85,28 +119,34 @@ void mouseClicked() {
     if(loc != null) {
         PVector pos = city.toPosition(loc.getLat(), loc.getLon());
         int i = city.select(pos);
-        city.highlight(i, #FF0000);
+        city.highlight(i, #00FF00);
         city.centerAt(i);
+        if(i != -1 && !monthRadiation.isActive()) mainCanvas = city.drawPlan(orthophoto, color(#FF0000, 170), i);
+        else mainCanvas.paint(orthophoto);
     }
 }
+
 
 void keyPressed() {
     switch(key) {
         case 'c':
             surface.toggleCalibration();
             break;
+            
+        case ' ':
+            monthRadiation.toggle();
+            if(!monthRadiation.isActive()) mainCanvas = orthophoto;
+            break;
+        
+        /*
         case 'r':
             it = -1;
             city.paint(#37383a);
             city.update();
             break;
-            
         case ' ':
-            city.paint("ir_use", colors.get("irradiation"));
+            city.paint("rad_aug", colors.get("irradiation"));
             break;
-            
-        case 'p':
-            showPlan = !showPlan;
-        
+        */
     }
 }
